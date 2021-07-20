@@ -5,25 +5,28 @@ const jwt = require('jsonwebtoken')
 const userSchema = mongoose.Schema({
     username: {
         type: String,
-        required: [true, 'Please provide a username']
+        required: [true, "Please provide your username"],
+        trim: true
     },
     email: {
         type: String,
         required: [true, 'Please provide an email'],
         unique: true,
-        match: [
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, 
-            'Please provide a valid Email'
-        ]
+        trim: true,
+        lowercase: true
     },
-        password: {
-            type: String,
-            required: [true, 'Please enter a password'], 
-            minLength: 5,
-            select: false
-        },
-        resetPasswordToken: String,
-        resetPasswordExpire: String
+    avatar: {
+        type: String,
+        default: "https://res.cloudinary.com/devatchannel/image/upload/v1602752402/avatar/avatar_cugq40.png"
+    },
+    role: {
+        type: Number,
+        default: 0
+    },
+    password: {
+        type: String,
+        required: [true, 'Please enter a password'], 
+        }
 })
 
 userSchema.pre('save', async function(next){

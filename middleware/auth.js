@@ -1,35 +1,21 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 
-exports.isAuthenticated = async (req, res, next) => {
-    let token
-    if(req.headers.authorization && req.headers.authorization.startsWith('Bearer')){
-        token = req.headers.authorization.split(' ')[1]
-    }
+const isAuthenticated = async (req, res, next) => {
+    const token = req.header('Authorization')
 
-    if(!token){
-        res.status(401).json({
-            success: false,
-            error: 'Token must be present'
-        })
-    }
+    if(!token) return res.status(400).json({msg: 'Invalid Authorization'})
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET)
-        const user = User.findById(decoded.id)
-        if(!user){
-            res.status(401).json({
-                success: false,
-                error: 'No user with this ID'
-            })
-        }
+        jwt.verify(token, process.env.JWT_SECRET, (err, user)=> {
+            if(err) return res.status(400).json({msg: 'Invalid Authorization'})
 
-        req.user = user
-
-        next()
-
+            req.user = user
+            next()
+        })
     } catch (error) {
-        res.send(error.message)
+        return res.status(400).json({msg: error.message})
     }
-    
 }
+
+module.exports = isAuthenticated
